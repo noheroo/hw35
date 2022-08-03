@@ -39,5 +39,11 @@ public class GlobalExceptionHandler {
                 .body("У студента не введен факультет");
     }
 
+    @ExceptionHandler(AvatarIsNullException.class)
+    public ResponseEntity<String> handleAvatarIsNullExceptionHandler(AvatarIsNullException e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body("Аватар не найден");
+    }
+
 
 }

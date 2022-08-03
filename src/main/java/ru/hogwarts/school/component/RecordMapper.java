@@ -28,8 +28,10 @@ public class RecordMapper {
 
     public Student toEntity(StudentRecord studentRecord) {
         Student student = new Student();
+        student.setId(studentRecord.getId());
         student.setName(studentRecord.getName());
         student.setAge(studentRecord.getAge());
+        student.setFaculty(toEntity(studentRecord.getFaculty()));
         return student;
     }
 
