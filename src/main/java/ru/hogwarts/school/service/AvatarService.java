@@ -4,10 +4,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import ru.hogwarts.school.component.RecordMapper;
-import ru.hogwarts.school.exception.AvatarIsNullException;
 import ru.hogwarts.school.model.Avatar;
 import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.repository.AvatarRepository;
+import ru.hogwarts.school.repository.StudentRepository;
 
 
 import javax.transaction.Transactional;
@@ -25,18 +25,19 @@ public class AvatarService {
     private String avatarsDir;
 
     private final AvatarRepository avatarRepository;
-    private final StudentService studentService;
+    private final StudentRepository studentRepository;
     private final RecordMapper recordMapper;
 
-    public AvatarService(AvatarRepository avatarRepository, StudentService studentService, RecordMapper recordMapper) {
+    public AvatarService(AvatarRepository avatarRepository, StudentRepository studentRepository, RecordMapper recordMapper) {
         this.avatarRepository = avatarRepository;
-        this.studentService = studentService;
+        this.studentRepository = studentRepository;
         this.recordMapper = recordMapper;
     }
 
     public void uploadAvatar(Long studentId, MultipartFile file) throws IOException {
 
-        Student student = recordMapper.toEntity(studentService.findStudent(studentId));
+        Student student = studentRepository.getById(studentId);
+//                recordMapper.toEntity(studentService.findStudent(studentId));
 
         Path filePath = Path.of(avatarsDir, studentId + "." + getExtension(file.getOriginalFilename()));
         Files.createDirectories((filePath.getParent()));
