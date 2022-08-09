@@ -5,14 +5,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.http.ResponseEntity;
 import ru.hogwarts.school.controller.StudentController;
 import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.model.Student;
 
-import java.util.List;
-
 import static org.assertj.core.api.Assertions.*;
 import static org.springframework.boot.test.context.SpringBootTest.*;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 class Hw35ApplicationTests {
@@ -44,7 +44,20 @@ class Hw35ApplicationTests {
 
     @Test
     void testAddStudent() throws Exception {
-        assertThat(restTemplate.postForObject("http://localhost:" + port + "/student",testStudent(), Student.class)).isEqualTo(testStudent());
+        assertThat(restTemplate.postForObject("http://localhost:" + port + "/student", testStudent(), Student.class)).isEqualTo(testStudent());
+
+    }
+
+    @Test
+    void testEditStudent() throws Exception {
+        restTemplate.put("http://localhost:" + port + "/student", testStudent2(), Student.class);
+        assertThat(restTemplate.getForObject("http://localhost:" + port + "/student/19", Student.class)).isEqualTo(testStudent2());
+    }
+
+    @Test
+    void testFindNotExistedStudent() throws Exception {
+        assertThat(restTemplate.getForObject("http://localhost:" + port + "/student/34", ResponseEntity.class)
+                .getStatusCode()).isEqualTo(NOT_FOUND);
 
     }
 
