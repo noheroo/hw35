@@ -1,8 +1,8 @@
 package ru.hogwarts.school;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -10,17 +10,20 @@ import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import ru.hogwarts.school.component.RecordMapper;
 import ru.hogwarts.school.controller.FacultyController;
 import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.repository.FacultyRepository;
 import ru.hogwarts.school.service.FacultyService;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import java.util.Optional;
 
-@WebMvcTest
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static ru.hogwarts.school.Constants.*;
+
+@WebMvcTest(controllers = FacultyController.class)
 public class MvcTests {
 
     @Autowired
@@ -32,34 +35,94 @@ public class MvcTests {
     @SpyBean
     private FacultyService facultyService;
 
-    @InjectMocks
-    private FacultyController facultyController;
+    @SpyBean
+    private RecordMapper recordMapper;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @Test
-    void addFacultyTest() throws Exception {
-        final Long id= 165L;
-        final String name = "testJson";
-        final String color = "green-blue";
+    void testFindFaculty() throws Exception {
+
+        when(facultyRepository.findById(any(Long.class))).thenReturn(Optional.of(TEST_FACULTY_1));
+
+        mockMvc.perform(MockMvcRequestBuilders
+                        .get("/faculty/{id}", ID1)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(ID1))
+                .andExpect(jsonPath("$.name").value(NAME1))
+                .andExpect(jsonPath("$.color").value(COLOR1));
+    }
+
+    @Test
+    void testFindFacultyFilteredByColor() throws Exception {
+
+        when(facultyRepository.findFacultiesByNameIgnoreCaseOrColorIgnoreCase(any(String.class), any(String.class))).thenReturn(TEST_LIST);
+        mockMvc.perform(MockMvcRequestBuilders
+                        .get("/faculty/filter")
+                        .queryParam("nameOrColor", COLOR1)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(TEST_LIST)));
+    }
+
+    @Test
+    void testAddFaculty() throws Exception {
 
         JSONObject facultyObject = new JSONObject();
-        facultyObject.put("name", name);
-        facultyObject.put("color", color);
+        facultyObject.put("id", ID1);
+        facultyObject.put("name", NAME1);
+        facultyObject.put("color", COLOR1);
 
-        Faculty faculty = new Faculty();
-        faculty.setId(id);
-        faculty.setName(name);
-        faculty.setColor(color);
+        when(facultyRepository.save(any(Faculty.class))).thenReturn(TEST_FACULTY_1);
 
-        when(facultyRepository.save(any(Faculty.class))).thenReturn(faculty);
         mockMvc.perform(MockMvcRequestBuilders
                         .post("/faculty")
                         .content(facultyObject.toString())
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(id))
-                .andExpect(jsonPath("$.name").value(name))
-                .andExpect(jsonPath("$.color").value(color));
+                .andExpect(jsonPath("$.id").value(ID1))
+                .andExpect(jsonPath("$.name").value(NAME1))
+                .andExpect(jsonPath("$.color").value(COLOR1));
+    }
 
+    @Test
+    void testEditFaculty() throws Exception {
+        JSONObject facultyObject = new JSONObject();
+        facultyObject.put("id", ID1);
+        facultyObject.put("name", NAME3);
+        facultyObject.put("color", COLOR3);
+
+        when(facultyRepository.findById(any(Long.class))).thenReturn(Optional.of(TEST_FACULTY_1));
+        when(facultyRepository.save(any(Faculty.class))).thenReturn(TEST_FACULTY_3);
+
+        mockMvc.perform(MockMvcRequestBuilders
+                        .put("/faculty")
+                        .content(facultyObject.toString())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(ID1))
+                .andExpect(jsonPath("$.name").value(NAME3))
+                .andExpect(jsonPath("$.color").value(COLOR3));
+    }
+
+    @Test
+    void testDeleteFaculty()throws Exception {
+        when(facultyRepository.findById(any(Long.class))).thenReturn(Optional.of(TEST_FACULTY_1));
+
+        mockMvc.perform(MockMvcRequestBuilders
+                        .delete("/faculty/{id}", ID1)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(ID1))
+                .andExpect(jsonPath("$.name").value(NAME1))
+                .andExpect(jsonPath("$.color").value(COLOR1));
+        verify(facultyRepository,atLeastOnce()).delete(any(Faculty.class));
     }
 }

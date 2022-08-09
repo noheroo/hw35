@@ -56,7 +56,7 @@ class Hw35ApplicationTests {
 
     @Test
     void testFindNotExistedStudent() throws Exception {
-        assertThat(restTemplate.getForObject("http://localhost:" + port + "/student/34", ResponseEntity.class)
+        assertThat(restTemplate.getForEntity("http://localhost:" + port + "/student/34", Student.class)
                 .getStatusCode()).isEqualTo(NOT_FOUND);
 
     }

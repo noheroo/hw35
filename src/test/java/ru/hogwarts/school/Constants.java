@@ -1,28 +1,25 @@
 package ru.hogwarts.school;
 
-import org.json.JSONException;
-import org.json.JSONObject;
 import ru.hogwarts.school.model.Faculty;
-import ru.hogwarts.school.model.Student;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Constants {
-    public static void testConstants() {
 
-        Faculty testFaculty = new Faculty();
-        testFaculty.setColor("red");
-        testFaculty.setName("testFac");
-        testFaculty.setId(300L);
+    public static final Long ID1= 101L;
+    public static final String NAME1 = "testName1";
+    public static final String COLOR1 = "testColor1";
 
-        Student testStudent = new Student();
-        testStudent.setAge(10);
-        testStudent.setName("testStu");
-        testStudent.setFaculty(testFaculty);
-        testStudent.setId(300L);
-    }
-    public void testStudent() throws JSONException {
-        JSONObject studentObject = new JSONObject();
-        studentObject.put("name", "testname");
-        studentObject.put("age", 200);
-    }
+    public static final Long ID2= 102L;
+    public static final String NAME2 = "testName2";
 
+    public static final String NAME3 = "testName3";
+    public static final String COLOR3 = "testColor3";
+
+    public static final Faculty TEST_FACULTY_1 = new Faculty(ID1,NAME1,COLOR1);
+    public static final Faculty TEST_FACULTY_2 = new Faculty(ID2,NAME2,COLOR1);
+    public static final Faculty TEST_FACULTY_3 = new Faculty(ID1,NAME3,COLOR3);
+
+    public static final List<Faculty> TEST_LIST = new ArrayList<>(List.of(TEST_FACULTY_1, TEST_FACULTY_2));
 }

@@ -34,10 +34,10 @@ public class FacultyService {
     }
 
     public FacultyRecord editFaculty(FacultyRecord facultyRecord) {
-        Faculty oldFaculty = recordMapper.toEntity(findFaculty(facultyRecord.getId()));
-        oldFaculty.setName(facultyRecord.getName());
-        oldFaculty.setColor(facultyRecord.getColor());
-        return recordMapper.toRecord(facultyRepository.save(oldFaculty));
+        Faculty newFaculty = recordMapper.toEntity(findFaculty(facultyRecord.getId()));
+        newFaculty.setName(facultyRecord.getName());
+        newFaculty.setColor(facultyRecord.getColor());
+        return recordMapper.toRecord(facultyRepository.save(newFaculty));
     }
 
     public FacultyRecord deleteFaculty(long id) {
