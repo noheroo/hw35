@@ -5,12 +5,10 @@ import ru.hogwarts.school.component.RecordMapper;
 import ru.hogwarts.school.exception.EntranceColorOrNameAreWrongException;
 import ru.hogwarts.school.exception.FacultyNotFoundException;
 import ru.hogwarts.school.model.Faculty;
-import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.record.FacultyRecord;
 import ru.hogwarts.school.record.StudentRecord;
 import ru.hogwarts.school.repository.FacultyRepository;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
