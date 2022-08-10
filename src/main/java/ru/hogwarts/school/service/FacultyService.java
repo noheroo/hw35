@@ -5,12 +5,10 @@ import ru.hogwarts.school.component.RecordMapper;
 import ru.hogwarts.school.exception.EntranceColorOrNameAreWrongException;
 import ru.hogwarts.school.exception.FacultyNotFoundException;
 import ru.hogwarts.school.model.Faculty;
-import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.record.FacultyRecord;
 import ru.hogwarts.school.record.StudentRecord;
 import ru.hogwarts.school.repository.FacultyRepository;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,14 +34,15 @@ public class FacultyService {
     }
 
     public FacultyRecord editFaculty(FacultyRecord facultyRecord) {
-        Faculty oldFaculty = recordMapper.toEntity(findFaculty(facultyRecord.getId()));
-        oldFaculty.setName(facultyRecord.getName());
-        oldFaculty.setColor(facultyRecord.getColor());
-        return recordMapper.toRecord(facultyRepository.save(oldFaculty));
+        Faculty newFaculty = recordMapper.toEntity(findFaculty(facultyRecord.getId()));
+        newFaculty.setName(facultyRecord.getName());
+        newFaculty.setColor(facultyRecord.getColor());
+        return recordMapper.toRecord(facultyRepository.save(newFaculty));
     }
 
     public FacultyRecord deleteFaculty(long id) {
-        Faculty faculty = recordMapper.toEntity(findFaculty(id));
+        Faculty faculty = facultyRepository.findById(id)
+                .orElseThrow(FacultyNotFoundException::new);
         facultyRepository.delete(faculty);
         return recordMapper.toRecord(faculty);
     }

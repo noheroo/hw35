@@ -1,6 +1,7 @@
 package ru.hogwarts.school.handler;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -18,6 +19,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(FacultyNotFoundException.class)
     public ResponseEntity<String> handleFacultyExceptionHandler(FacultyNotFoundException e) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .contentType(MediaType.TEXT_PLAIN)
                 .body("Факультет не найден");
     }
 
@@ -37,6 +39,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleStudentWithoutFacultyExceptionHandler(StudentWithoutFacultyException e) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body("У студента не введен факультет");
+    }
+
+    @ExceptionHandler(AvatarIsNullException.class)
+    public ResponseEntity<String> handleAvatarIsNullExceptionHandler(AvatarIsNullException e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body("Аватар не найден");
     }
 
 
