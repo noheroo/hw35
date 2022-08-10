@@ -41,7 +41,8 @@ public class FacultyService {
     }
 
     public FacultyRecord deleteFaculty(long id) {
-        Faculty faculty = recordMapper.toEntity(findFaculty(id));
+        Faculty faculty = facultyRepository.findById(id)
+                .orElseThrow(FacultyNotFoundException::new);
         facultyRepository.delete(faculty);
         return recordMapper.toRecord(faculty);
     }

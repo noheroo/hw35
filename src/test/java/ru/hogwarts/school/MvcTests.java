@@ -8,6 +8,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import ru.hogwarts.school.component.RecordMapper;
@@ -16,6 +18,8 @@ import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.repository.FacultyRepository;
 import ru.hogwarts.school.service.FacultyService;
 
+import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -58,15 +62,17 @@ public class MvcTests {
 
     @Test
     void testFindFacultyFilteredByColor() throws Exception {
+        System.out.println(objectMapper.writeValueAsString(TEST_LIST));
 
-        when(facultyRepository.findFacultiesByNameIgnoreCaseOrColorIgnoreCase(any(String.class), any(String.class))).thenReturn(TEST_LIST);
+        when(facultyRepository.findFacultiesByNameIgnoreCaseOrColorIgnoreCase(any(String.class), any(String.class)))
+                .thenReturn(TEST_LIST);
         mockMvc.perform(MockMvcRequestBuilders
                         .get("/faculty/filter")
                         .queryParam("nameOrColor", COLOR1)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(TEST_LIST)));
+                .andExpect(content().json(objectMapper.writeValueAsString(List.of(recordMapper.toRecord(TEST_FACULTY_21),recordMapper.toRecord(TEST_FACULTY_22)))));
     }
 
     @Test

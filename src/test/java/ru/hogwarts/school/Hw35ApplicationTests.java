@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.http.ResponseEntity;
+import ru.hogwarts.school.component.RecordMapper;
 import ru.hogwarts.school.controller.StudentController;
 import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.model.Student;
@@ -13,6 +13,7 @@ import ru.hogwarts.school.model.Student;
 import static org.assertj.core.api.Assertions.*;
 import static org.springframework.boot.test.context.SpringBootTest.*;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.http.HttpStatus.OK;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 class Hw35ApplicationTests {
@@ -23,6 +24,8 @@ class Hw35ApplicationTests {
     @Autowired
     private StudentController studentController;
 
+    @Autowired
+    private RecordMapper recordMapper;
     @Autowired
     private TestRestTemplate restTemplate;
 
@@ -44,7 +47,8 @@ class Hw35ApplicationTests {
 
     @Test
     void testAddStudent() throws Exception {
-        assertThat(restTemplate.postForObject("http://localhost:" + port + "/student", testStudent(), Student.class)).isEqualTo(testStudent());
+        assertThat(restTemplate.postForObject("http://localhost:" + port + "/student", testStudent(), Student.class))
+                .isEqualTo(testStudent());
 
     }
 
@@ -56,11 +60,25 @@ class Hw35ApplicationTests {
 
     @Test
     void testFindNotExistedStudent() throws Exception {
-        assertThat(restTemplate.getForEntity("http://localhost:" + port + "/student/34", Student.class)
+        assertThat(restTemplate.getForEntity("http://localhost:" + port + "/student/34", String.class)
                 .getStatusCode()).isEqualTo(NOT_FOUND);
 
+        assertThat(restTemplate.getForObject("http://localhost:" + port + "/student/34", String.class))
+                .isEqualTo("Студент не найден");
     }
 
+    @Test
+    void testDeleteStudent() throws Exception {
+       assertThat(restTemplate.getForEntity(url, String.class)
+                .getStatusCode()).isEqualTo(OK);
+
+        restTemplate.delete(url);
+
+        assertThat(restTemplate.getForEntity(url, String.class)
+                .getStatusCode()).isEqualTo(NOT_FOUND);
+    }
+
+    private String url = "http://localhost:" + port + "/student/67";
     private Faculty testFaculty() {
         Faculty testFaculty = new Faculty();
         testFaculty.setId(12L);
@@ -71,7 +89,7 @@ class Hw35ApplicationTests {
 
     private Student testStudent() {
         Student testStudent = new Student();
-        testStudent.setId(19L);
+//        testStudent.setId(19L);
         testStudent.setAge(25);
         testStudent.setName("Trevor");
         testStudent.setFaculty(testFaculty());
